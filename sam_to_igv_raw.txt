@@ -1,0 +1,40 @@
+module load samtools/intel/1.3.1
+
+for FILE in *.sam; do samtools view -Sb $FILE > ${FILE%.sam}.bam; done
+
+for FILE in *.bam; do samtools sort -o ${FILE%.bam}_s.bam -O 'bam' -T 'temp' $FILE; done
+
+for FILE in *_s.bam; do samtools index $FILE; done
+
+
+
+
+
+
+function prep_for_IGV() {
+
+    echo \
+"------------------------------------------------------------------------------"
+    echo "                            Prepare SAM file for IGV"
+    echo \
+"------------------------------------------------------------------------------"
+    echo "Converting $1 to BAM format..."
+    /Applications/samtools-1.3.1/samtools view -Sb $1 > ${1%.sam}.bam
+
+    echo "Sorting ${1%.sam}.bam..."
+    /Applications/samtools-1.3.1/samtools sort -o ${1%.sam}_s.bam -O 'bam' -T 'temp' ${1%.sam}.bam
+
+    echo "Indexing ${1%.sam}_s.bam..."
+    /Applications/samtools-1.3.1/samtools index ${1%.sam}_s.bam
+
+    echo
+    echo “Done!"
+    echo \
+"------------------------------------------------------------------------------";
+}
+
+
+
+
+sbatch --export INPUT=HN2LKAFXX_n01_ah7797i3h34c-0817.fastq.gz,CHIP=HN2LKAFXX_n01_ah7797red1-0817.fastq.gz,GEN="SK1Yue-PM",TAGI="AH7797i3h34c-0817",TAGC="ah7797red1-0817",PEAK="BOTH" ~/ChIPseq_Pipeline_v3/ChIPseq-pipeline_v3.sbatch
+
