@@ -29,23 +29,10 @@ main() {
     echo "${FLAG}" 
 }
 
-#- Source utilities ------------------------------------------------------------
-source_utils() {
-    UTILSPATH="${SCRIPTPATH}/lib/utils.sh" # Update path to find utilities
-
-    if [ -f "${UTILSPATH}" ]
-    then
-        source "${UTILSPATH}"
-    else
-        echo >&2 "${SCRIPTNAME} ERROR: Could not find utilities file (utils.sh)"
-        exit 1
-    fi
-}
-
 #- Print usage -----------------------------------------------------------------
 # Print usage
 help_menu() {
-    printf "${SCRIPTNAME} [-a INT|STR] [-g]
+    printf "${SCRIPTNAME} [-a INT|STR] [-g] <input.sam|input.SAM>
 
 Convert SAM file to indexed BAM to visualize with genome browser.
 
