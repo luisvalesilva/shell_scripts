@@ -26,7 +26,7 @@ main() {
     # source_utils
 
     # Was an input file provided?
-    check_input ${INPUTFILE}
+    check_input_file ${INPUTFILE}
     
     # Prepare fle name variables
     EXT="${1##*.}"
@@ -39,7 +39,7 @@ main() {
     BAM_NOEXT="${BAM%.*}"
 
     # Check input file: is it a SAM file?
-    check_sam ${SAM} ${SAM_NOPATH_NOEXT}
+    check_sam_ext ${SAM} ${SAM_NOPATH_NOEXT}
 
     # Does "samtools" command work?
     check_command ${SAMTOOLS}
@@ -58,7 +58,17 @@ main() {
 
 #- Print usage -----------------------------------------------------------------
 help_menu() {
-    printf "Usage: ${SCRIPTNAME} [-s] <input.sam|input.SAM>
+    printf "
+--------------------------------------------------------------
+     _____ ___    __  ___   __           ___________    __
+    / ___//   |  /  |/  /  / /_____     /  _/ ____/ |  / /
+    \__ \/ /| | / /|_/ /  / __/ __ \    / // / __ | | / / 
+   ___/ / ___ |/ /  / /  / /_/ /_/ /  _/ // /_/ / | |/ /  
+  /____/_/  |_/_/  /_/   \__/\____/  /___/\____/  |___/   
+
+--------------------------------------------------------------
+
+Usage: ${SCRIPTNAME} [-s] <input.sam|input.SAM>
 
 Convert SAM file to sorted and indexed BAM
 to visualize with genome browser.
@@ -116,23 +126,27 @@ INPUTFILE=${1}
 
 #- Helper functions ------------------------------------------------------------
 
-check_input() {
-    if [ -z "$1" ]
+check_input_file() {
+    if [ -z "${1}" ]
     then
         echo >&2 "${SCRIPTNAME} ERROR: No input file provided"
         exit 1
+    else
+        if [ ! -f ${1} ]
+        then
+            echo >&2 "${SCRIPTNAME} ERROR: ${1} file not found"
+            exit 1
+        fi
     fi
 }
 
-check_sam() {
+#TODO: No longer need to check if file is there!
+check_sam_ext() {
     # Check input file extension: is it a SAM file?
-    local IN_DIR=$(dirname "$1")
-    local FILE=$(find ${IN_DIR} -iname "${2}.sam")
-
-    if [ -z "${FILE}" ]
+    if [[ ${1} != *.sam && ${1} != *.SAM ]]
     then
-        echo >&2 "${SCRIPTNAME} ERROR: '$(basename "${1}")' not found"
-        echo >&2 "(or does not include a '.sam' or '.SAM' extension)"
+        echo >&2 "${SCRIPTNAME} ERROR: '${1}'
+Input file does not end with a '.sam' or '.SAM' extension"
         exit 1
     fi
 }
