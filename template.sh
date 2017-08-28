@@ -30,8 +30,12 @@ SCRIPTPATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 main() {
     # source_utils
-    echo "${ARGVALUE}"
-    echo "${FLAG}" 
+    # Was an input file provided?
+    check_input ${INPUTFILE}
+
+    echo "-a option value is ${ARGVALUE}"
+    echo "Flag is turned ${FLAG}"
+    echo "Input file is ${INPUTFILE}" 
 }
 
 #- Source utilities ------------------------------------------------------------
@@ -50,7 +54,7 @@ source_utils() {
 #- Print usage -----------------------------------------------------------------
 # Print usage
 help_menu() {
-    printf "${SCRIPTNAME} [-a INT|STR] [-g]
+    printf "${SCRIPTNAME} [-a INT|STR] [-g] <input.file>
 
 This is my script template.
 
@@ -83,10 +87,10 @@ do
         --version)
             echo "${SCRIPTNAME} ${VERSION}"; exit 0;;
         -a|--argument)
-            ARGVALUE="$2"
+            ARGVALUE="${2}"
             if [ -z ${ARGVALUE} ]
             then
-                echo >&2 "${SCRIPTNAME} ERROR: Argument '$1' requires a value"
+                echo >&2 "${SCRIPTNAME} ERROR: Argument '${1}' requires a value"
                 exit 1
             fi
             shift;;
@@ -94,7 +98,7 @@ do
             FLAG=on;;
         -*)
             echo >&2 \
-            "${SCRIPTNAME} ERROR: Illegal option '$1'. Please review usage"
+            "${SCRIPTNAME} ERROR: Illegal option '${1}'. Please review usage"
             echo
             help_menu
             exit 1;;
@@ -103,5 +107,24 @@ do
     shift
 done
 
+# Collect input file name; later check it was provided
+INPUTFILE=${1}
+
+#- Helper functions ------------------------------------------------------------
+check_input() {
+    if [ -z "${1}" ]
+    then
+        echo >&2 "${SCRIPTNAME} ERROR: No input file provided"
+        exit 1
+    else
+        if [ ! -f ${1} ]
+        then
+            echo >&2 "${SCRIPTNAME} ERROR: ${1} file not found"
+            exit 1
+        fi
+    fi
+}
+
 #- Run main function -----------------------------------------------------------
-main 
+main
+
