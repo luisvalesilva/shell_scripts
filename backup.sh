@@ -13,7 +13,7 @@
 #   Backup files from a source to a destination directory.
 #
 # Depends on:
-#  rsync
+#   rsync
 #
 # Luis Vale Silva • https://github.com/luisvalesilva
 #-------------------------------------------------------------------------------
@@ -22,6 +22,8 @@ SCRIPTNAME=$(basename "${0}")
 VERSION=0.1.0
 SCRIPTPATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 COMMAND=rsync
+DRY=off
+QUIET=off
 
 main() {
     # Were the required options provided?
@@ -41,7 +43,7 @@ main() {
 
     # Dry run?
     [ ${DRY} = 'on' ] && COMMAND="${COMMAND} --dry-run"
-    [[ ${DRY} = 'on' && ${QUIET} = 'off' ]] && echo "Starting dry run..." && echo
+    [[ ${DRY} = 'on' && ${QUIET} = 'off' ]] && echo "Dry run..." && echo
     
     [ ${QUIET} = 'on' ] && COMMAND="${COMMAND} --quiet"
 
@@ -95,9 +97,6 @@ then
 fi
 
 # Parse arguments
-DRY=off
-QUIET=off
-
 while [[ $# -gt 0 ]]
 do
     case "$1" in
