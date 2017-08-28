@@ -31,7 +31,7 @@ SCRIPTPATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 main() {
     # source_utils
     # Was an input file provided?
-    check_input ${INPUTFILE}
+    check_input_file ${INPUTFILE}
 
     echo "-a option value is ${ARGVALUE}"
     echo "Flag is turned ${FLAG}"
@@ -111,7 +111,7 @@ done
 INPUTFILE=${1}
 
 #- Helper functions ------------------------------------------------------------
-check_input() {
+check_input_file() {
     if [ -z "${1}" ]
     then
         echo >&2 "${SCRIPTNAME} ERROR: No input file provided"
