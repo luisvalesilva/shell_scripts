@@ -10,7 +10,7 @@
 #-------------------------------------------------------------------------------
 #
 # Description:
-#   Convert SAM file to indexed BAM.
+#   Convert SAM file to sorted and indexed BAM.
 #
 # Depends on:
 #  samtools
@@ -33,15 +33,15 @@ main() {
     SAM="$1"
     SAM_NOEXT="${1%.*}"
     SAM_NOPATH=$(basename "$1")
+    SAM_NOPATH_NOEXT=${SAM_NOPATH%.*}
     BAM=${SAM_NOEXT}.bam
     BAM_NOPATH=$(basename "$BAM")
     BAM_NOEXT="${BAM%.*}"
 
     # Check input file: is it a SAM file?
-    check_sam ${SAM} ${SAM_NOEXT}
+    check_sam ${SAM} ${SAM_NOPATH_NOEXT}
 
     # Does "samtools" command work?
-    #TODO: check_command not working - does not stop execution
     check_command ${SAMTOOLS}
 
     echo "Converting ${SAM_NOPATH} to BAM format..."
@@ -50,18 +50,18 @@ main() {
     echo "Sorting ${BAM_NOPATH}..."
     ${SAMTOOLS} sort -o ${BAM_NOEXT}_s.bam -O 'bam' -T 'temp' ${BAM}
 
-    echo "Indexing ${BAM_NOEXT}_s.bam..."
+    echo "Indexing ${BAM_NOPATH}_s.bam..."
     ${SAMTOOLS} index ${BAM_NOEXT}_s.bam
 
     echo "Done!"
 }
 
 #- Print usage -----------------------------------------------------------------
-# Print usage
 help_menu() {
-    printf "${SCRIPTNAME} [-s STR] <input.sam|input.SAM>
+    printf "Usage: ${SCRIPTNAME} [-s] <input.sam|input.SAM>
 
-Convert SAM file to indexed BAM to visualize with genome browser.
+Convert SAM file to sorted and indexed BAM
+to visualize with genome browser.
 
  Options:
   -s, --samtools    Optional path to samtools executable
@@ -125,7 +125,7 @@ check_input() {
 }
 
 check_sam() {
-    # Check input file: is it a SAM file?
+    # Check input file extension: is it a SAM file?
     local IN_DIR=$(dirname "$1")
     local FILE=$(find ${IN_DIR} -iname "${2}.sam")
 
@@ -138,8 +138,9 @@ check_sam() {
 }
 
 check_command() {
-    hash ${1} 2>/dev/null || \
-    { echo >&2 "${SCRIPTNAME} ERROR: Could not find ${1}"; exit 1; }
+    type ${1} >/dev/null 2>&1 || {
+    echo >&2 "${SCRIPTNAME} ERROR: Could not find ${1}"; exit 1
+    }
 }
 
 #- Run main function -----------------------------------------------------------
