@@ -65,7 +65,12 @@ This is my script template.
 
 #- Parse arguments (using straight bash; no getopts)----------------------------
 # Print usage if called with no options
-[ $# -lt 1 ] && echo ""; help_menu; exit 0
+if [ $# -lt 1 ]
+then
+    echo
+    help_menu
+    exit 0
+fi
 
 # Parse arguments
 FLAG=off
