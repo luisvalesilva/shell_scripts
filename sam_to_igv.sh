@@ -33,13 +33,12 @@ main() {
     SAM="$1"
     SAM_NOEXT="${1%.*}"
     SAM_NOPATH=$(basename "$1")
-    SAM_NOPATH_NOEXT=${SAM_NOPATH%.*}
     BAM=${SAM_NOEXT}.bam
     BAM_NOPATH=$(basename "$BAM")
     BAM_NOEXT="${BAM%.*}"
 
     # Check input file: is it a SAM file?
-    check_sam_ext ${SAM} ${SAM_NOPATH_NOEXT}
+    check_sam_ext ${SAM}
 
     # Does "samtools" command work?
     check_command ${SAMTOOLS}
@@ -140,7 +139,6 @@ check_input_file() {
     fi
 }
 
-#TODO: No longer need to check if file is there!
 check_sam_ext() {
     # Check input file extension: is it a SAM file?
     if [[ ${1} != *.sam && ${1} != *.SAM ]]
