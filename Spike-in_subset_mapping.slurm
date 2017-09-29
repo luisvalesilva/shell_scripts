@@ -20,17 +20,19 @@
 # normalization factor (SPINF) across sequencing depths.
 
 ### Argument options:
-# EXPID     Custom ID for output files
-# RUNDIR    Path to directory to run script and save output in
-# FQ        Absolute path to input fastq file
-# NREADS    Number of reads (in millions) to use from the input fastq file
+# EXPID             Custom ID for output files
+# RUNDIR            Path to directory to run script and save output in
+# FQ                Path to input fastq file
+# NREADS            Number of reads in the subsample (in millions)
+# GZIP [GZIP=T/?]   If GZIP=T FASTQ file is gzipped at the end
+#                   (only done if input file was originally gzipped)
 
 ### EXAMPLE:
 # sbatch --export \
 # EXPID="ah119spikea-062817_2M",\
 # RUNDIR="/scratch/lv38",\
 # FQ="HLYHHAFXX_n01_ah119spikea-062817_trimmed.fq.gz",\
-# NREADS=2 \
+# NREADS=2,GZIP=T \
 # Spike-in_subset_mapping.slurm
 
 #------------------------------------------------------------------------------#
@@ -93,6 +95,7 @@ check_arg $EXPID
 check_arg $RUNDIR 
 check_arg $FQ
 check_arg $NREADS
+check_arg $GZIP
 
 cd $RUNDIR
 
@@ -150,12 +153,21 @@ REFGEN='/home/lv38/Library/S288C_SK1_Yue_hybrid_genome/S288c_SK1_Yue'
 OUTSAM=${EXPID}_${NREADS}Mreads.sam
 
 bowtie -q -m 1 -v 0 -p 8 -S \
-    --un ${EXPID}_PM-Unaligned.fastq \
-    --max ${EXPID}_PM-Max.fastq \
+    --un ${EXPID}_${NREADS}Mreads_PM-Unaligned.fastq \
+    --max ${EXPID}_${NREADS}Mreads_PM-Max.fastq \
     $REFGEN $SUBFQ $OUTSAM
 
-# Was the file originally gzipped?
-[ ! -z ${ZIP_FQ+x} ] && echo ">>>>> gzip FASTQ file:" && echo $FQ && gzip $FQ
+
+if [ "$GZIP" = T ]
+then
+    # Was the file originally gzipped?
+    if [ ! -z ${ZIP_FQ+x} ]
+    then
+        echo ">>>>> gzip FASTQ file:"
+        echo $FQ
+        gzip $FQ
+    fi
+fi
 
 # Convert to BAM, sort and index
 # In the process, reset file variables to map files (to use in next step)
@@ -182,8 +194,8 @@ echo ">>>>> Delete unnecessary files..."
 rm $SUBFQ
 rm $SBAM
 rm ${SBAM}.bai
-rm ${EXPID}_PM-Unaligned.fastq
-rm ${EXPID}_PM-Max.fastq
+rm ${EXPID}_${NREADS}Mreads_PM-Unaligned.fastq
+rm ${EXPID}_${NREADS}Mreads_PM-Max.fastq
 
 #------------------------------------------------------------------------------#
 ELAPSEDTIME=$(elapsed_time $STARTTIME)
