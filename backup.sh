@@ -72,7 +72,7 @@ help_menu() {
 
 Usage: ${SCRIPTNAME} [-n|--dry-run] [-s SRC_DIR] [-d DEST_DIR]
 
-Backup files in source directory on destination directory.
+Backup files in indicated source directory to destination directory.
 
  Options:
   -s, --source          Path to source directory
